@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6249" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
-        <deployment defaultVersion="1792" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6243"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TGCameraViewController">
@@ -10,12 +10,9 @@
                 <outlet property="bottomLeftView" destination="2rS-OA-lDQ" id="3Tj-6s-eEi"/>
                 <outlet property="bottomRightView" destination="HFV-tF-409" id="gvx-Rz-7bX"/>
                 <outlet property="captureView" destination="dIq-rQ-gzr" id="F4T-QP-lPu"/>
-                <outlet property="flashButton" destination="p7O-pE-Mp0" id="Tqo-vg-CGw"/>
-                <outlet property="gridButton" destination="Nol-dD-ETh" id="tfG-QF-CbC"/>
                 <outlet property="shotButton" destination="wtQ-Dg-G3i" id="cWY-WV-5Gp"/>
                 <outlet property="slideDownView" destination="Czb-nz-m44" id="Ga2-kT-HSY"/>
                 <outlet property="slideUpView" destination="vJp-kA-okD" id="hiW-4t-8lC"/>
-                <outlet property="toggleButton" destination="WJG-N5-BnZ" id="QRP-Z9-Zpe"/>
                 <outlet property="topLeftView" destination="ljD-PV-2sR" id="6yh-RZ-d0w"/>
                 <outlet property="topRightView" destination="umk-ea-F3l" id="bIA-Jv-2nh"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -77,41 +74,9 @@
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dit-c7-IZk" userLabel="Top View">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="50"/>
-                    <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WJG-N5-BnZ" userLabel="Toggle">
-                            <rect key="frame" x="0.0" y="5" width="50" height="40"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="40" id="Ohv-kM-K2G"/>
-                                <constraint firstAttribute="width" constant="50" id="ano-tf-LKd"/>
-                            </constraints>
-                            <state key="normal" image="CameraToggle">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="toggleTapped" destination="-1" eventType="touchUpInside" id="cnq-8L-ak1"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nol-dD-ETh" userLabel="Grid">
-                            <rect key="frame" x="550" y="5" width="50" height="40"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="50" id="7C6-xa-8et"/>
-                                <constraint firstAttribute="height" constant="40" id="Ulw-sc-Qe1"/>
-                            </constraints>
-                            <state key="normal" image="CameraGrid">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="gridTapped" destination="-1" eventType="touchUpInside" id="6m1-BO-Ve2"/>
-                            </connections>
-                        </button>
-                    </subviews>
                     <color key="backgroundColor" red="0.078431372549019607" green="0.078431372549019607" blue="0.078431372549019607" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
-                        <constraint firstAttribute="trailing" secondItem="Nol-dD-ETh" secondAttribute="trailing" id="R3m-pw-nvC"/>
-                        <constraint firstItem="WJG-N5-BnZ" firstAttribute="leading" secondItem="dit-c7-IZk" secondAttribute="leading" id="Va7-SY-m4l"/>
                         <constraint firstAttribute="height" constant="50" id="hyA-J5-S26"/>
-                        <constraint firstItem="Nol-dD-ETh" firstAttribute="top" secondItem="dit-c7-IZk" secondAttribute="top" constant="5" id="n4Z-P8-7L9"/>
-                        <constraint firstItem="WJG-N5-BnZ" firstAttribute="top" secondItem="dit-c7-IZk" secondAttribute="top" constant="5" id="wCB-e9-o4i"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rJ9-I8-VJI" userLabel="Bottom View">
@@ -139,30 +104,14 @@
                                 <action selector="shotTapped" destination="-1" eventType="touchUpInside" id="XqW-0H-DD4"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7O-pE-Mp0" userLabel="Flash">
-                            <rect key="frame" x="512" y="10" width="80" height="80"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="80" id="ORX-oj-ZSI"/>
-                                <constraint firstAttribute="width" constant="80" id="au7-7K-Q9I"/>
-                            </constraints>
-                            <state key="normal" image="CameraFlashAuto">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="flashTapped" destination="-1" eventType="touchUpInside" id="yzx-f1-HjP"/>
-                            </connections>
-                        </button>
                     </subviews>
                     <color key="backgroundColor" red="0.078431372549019607" green="0.078431372549019607" blue="0.078431372549019607" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstItem="O3k-MF-E1l" firstAttribute="leading" secondItem="rJ9-I8-VJI" secondAttribute="leading" constant="8" id="7V3-aL-brf"/>
                         <constraint firstAttribute="centerY" secondItem="wtQ-Dg-G3i" secondAttribute="centerY" id="GGn-PI-77o"/>
                         <constraint firstAttribute="bottom" secondItem="O3k-MF-E1l" secondAttribute="bottom" constant="8" id="QLg-Zd-GrZ"/>
-                        <constraint firstAttribute="bottom" secondItem="p7O-pE-Mp0" secondAttribute="bottom" constant="10" id="ScT-Lc-F4w"/>
                         <constraint firstAttribute="height" constant="100" id="Yv5-Cy-07J"/>
-                        <constraint firstItem="p7O-pE-Mp0" firstAttribute="top" secondItem="rJ9-I8-VJI" secondAttribute="top" constant="10" id="YwZ-Sh-nAE"/>
                         <constraint firstAttribute="centerX" secondItem="wtQ-Dg-G3i" secondAttribute="centerX" id="fIy-sn-2XV"/>
-                        <constraint firstAttribute="trailing" secondItem="p7O-pE-Mp0" secondAttribute="trailing" constant="8" id="zQG-No-Lon"/>
                     </constraints>
                 </view>
             </subviews>
@@ -227,9 +176,6 @@
     <resources>
         <image name="CameraClose" width="26" height="26"/>
         <image name="CameraDetail" width="58" height="58"/>
-        <image name="CameraFlashAuto" width="41" height="41"/>
-        <image name="CameraGrid" width="26" height="26"/>
         <image name="CameraShot" width="78" height="78"/>
-        <image name="CameraToggle" width="26" height="26"/>
     </resources>
 </document>

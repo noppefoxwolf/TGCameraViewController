@@ -33,7 +33,11 @@
 
 NSMutableDictionary *optionDictionary;
 
-@interface TGCamera ()
+@interface TGCamera ()<AVCaptureVideoDataOutputSampleBufferDelegate>{
+    AVCaptureVideoDataOutput*       videoOutput;            //  ビデオ出力デバイス
+    dispatch_queue_t                videoOutputQueue;       //  ビデオ出力用スレッド
+    UIImage* capImage;
+}
 
 @property (strong, nonatomic) AVCaptureSession *session;
 @property (strong, nonatomic) AVCaptureVideoPreviewLayer *previewLayer;
@@ -50,6 +54,108 @@ NSMutableDictionary *optionDictionary;
 
 
 @implementation TGCamera
+
+/////////////////////////////////////////////////
+//      ビデオキャプチャの初期化
+//      設定後:captureOutputが呼ばれる
+/////////////////////////////////////////////////
+-(BOOL)setupVideoCapture{
+    //////////////////////////////////
+    //    ビデオ出力デバイスの設定
+    //////////////////////////////////
+    NSDictionary *rgbOutputSettings = @{(id)kCVPixelBufferPixelFormatTypeKey: @(kCMPixelFormat_32BGRA)};
+    videoOutput = AVCaptureVideoDataOutput.new;
+    [videoOutput setVideoSettings:rgbOutputSettings];
+    [videoOutput setAlwaysDiscardsLateVideoFrames:YES];     //  NOだとコマ落ちしないが重い処理には向かない
+    videoOutputQueue = dispatch_queue_create("VideoData Output Queue", DISPATCH_QUEUE_SERIAL);
+    [videoOutput setSampleBufferDelegate:self queue:videoOutputQueue];
+    
+    if(videoOutput){
+        if ([_session canAddOutput:videoOutput]){
+            [_session addOutput:videoOutput];
+            return YES;
+        }
+    }
+    return NO;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//      ビデオキャプチャ時、 新しいフレームが書き込まれた際に通知を受けるデリゲートメソッド
+/////////////////////////////////////////////////////////////////////////////////
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
+    @autoreleasepool {
+        //     キャプチャ画像からUIImageを作成する
+        CGImageRef cgImage = [self imageFromSampleBuffer:sampleBuffer];
+        capImage = [UIImage imageWithCGImage:cgImage];
+        CGImageRelease(cgImage);
+    }
+}
+
+-(UIImage*)captureImageSilentWithVideoOrientation:(AVCaptureVideoOrientation)videoOrientation{
+    return [self rotateImage:capImage angle:videoOrientation];
+}
+-(UIImage*)rotateImage:(UIImage*)img angle:(AVCaptureVideoOrientation)angle
+{
+    CGImageRef      imgRef = [img CGImage];
+    CGContextRef    context;
+    
+    switch (angle) {
+        case AVCaptureVideoOrientationPortraitUpsideDown:
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(img.size.height, img.size.width), YES, img.scale);
+            context = UIGraphicsGetCurrentContext();
+            CGContextTranslateCTM(context, img.size.height, img.size.width);
+            CGContextScaleCTM(context, 1, -1);
+            CGContextRotateCTM(context, M_PI_2);
+            break;
+        case AVCaptureVideoOrientationLandscapeLeft:
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(img.size.width, img.size.height), YES, img.scale);
+            context = UIGraphicsGetCurrentContext();
+            CGContextTranslateCTM(context, img.size.width, 0);
+            CGContextScaleCTM(context, 1, -1);
+            CGContextRotateCTM(context, -M_PI);
+            break;
+        case AVCaptureVideoOrientationPortrait:
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(img.size.height, img.size.width), YES, img.scale);
+            context = UIGraphicsGetCurrentContext();
+            CGContextScaleCTM(context, 1, -1);
+            CGContextRotateCTM(context, -M_PI_2);
+            break;
+        default:
+            return img;
+            break;
+    }
+    
+    CGContextDrawImage(context, CGRectMake(0, 0, img.size.width, img.size.height), imgRef);
+    UIImage*    result = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return result;
+}
+
+
+//////////////////////////////////////////////////////
+//      SampleBufferをCGImageRefに変換する
+//////////////////////////////////////////////////////
+- (CGImageRef) imageFromSampleBuffer:(CMSampleBufferRef) sampleBuffer
+{
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVPixelBufferLockBaseAddress(imageBuffer,0);        //      バッファをロック
+    
+    uint8_t *baseAddress = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(imageBuffer, 0);
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    CGContextRef newContext = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    CGImageRef newImage = CGBitmapContextCreateImage(newContext);
+    CGContextRelease(newContext);
+    
+    CGColorSpaceRelease(colorSpace);
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);      //      バッファをアンロック
+    
+    return newImage;
+}
 
 + (instancetype)cameraWithFlashButton:(UIButton *)flashButton
 {
@@ -70,7 +176,7 @@ NSMutableDictionary *optionDictionary;
     }
 }
 
- + (id)getOption:(NSString *)option
++ (id)getOption:(NSString *)option
 {
     if (optionDictionary == nil) {
         [TGCamera initOptions];
@@ -131,9 +237,9 @@ NSMutableDictionary *optionDictionary;
 - (void)takePhotoWithCaptureView:(UIView *)captureView effectiveScale:(NSInteger)effectiveScale videoOrientation:(AVCaptureVideoOrientation)videoOrientation completion:(void (^)(UIImage *))completion
 {
     [TGCameraShot takePhotoCaptureView:captureView stillImageOutput:_stillImageOutput effectiveScale:effectiveScale videoOrientation:videoOrientation
-    completion:^(UIImage *photo) {
-        completion(photo);
-    }];
+                            completion:^(UIImage *photo) {
+                                completion(photo);
+                            }];
 }
 
 - (void)toogleWithFlashButton:(UIButton *)flashButton
@@ -194,7 +300,7 @@ NSMutableDictionary *optionDictionary;
         
         [device unlockForConfiguration];
     }
-
+    
     //
     // add device input to session
     //
@@ -218,6 +324,9 @@ NSMutableDictionary *optionDictionary;
     //
     
     [TGCameraFlash flashModeWithCaptureSession:_session andButton:flashButton];
+    
+    // setup
+    [self setupVideoCapture];
 }
 
 + (void)initOptions

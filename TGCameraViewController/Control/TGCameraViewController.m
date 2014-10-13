@@ -24,7 +24,6 @@
 //  THE SOFTWARE.
 
 #import "TGCameraViewController.h"
-#import "TGPhotoViewController.h"
 #import "TGCameraSlideView.h"
 
 
@@ -109,7 +108,7 @@
     [super viewDidAppear:animated];
     
     [self deviceOrientationDidChangeNotification];
-
+    
     if (_wasLoaded == NO) {
         _wasLoaded = YES;
         [_camera insertSublayerWithCaptureView:_captureView atRootView:self.view];
@@ -170,16 +169,13 @@
 - (IBAction)shotTapped
 {
     _shotButton.enabled = NO;
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    AVCaptureVideoOrientation videoOrientation = [self videoOrientationForDeviceOrientation:deviceOrientation];
+    UIImage*photo = [_camera captureImageSilentWithVideoOrientation:videoOrientation];
     
     [TGCameraSlideView showSlideUpView:_slideUpView slideDownView:_slideDownView atView:_captureView completion:^{
-        UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
-        AVCaptureVideoOrientation videoOrientation = [self videoOrientationForDeviceOrientation:deviceOrientation];
-        
-        [_camera takePhotoWithCaptureView:_captureView effectiveScale:_effectiveScale videoOrientation:videoOrientation completion:^(UIImage *photo) {
-            TGPhotoViewController *viewController = [TGPhotoViewController newWithDelegate:_delegate photo:photo];
-            [self.navigationController pushViewController:viewController animated:YES];
-            _shotButton.enabled = YES;
-        }];
+        _shotButton.enabled = YES;
+        [_delegate cameraDidTakePhoto:photo];
     }];
 }
 

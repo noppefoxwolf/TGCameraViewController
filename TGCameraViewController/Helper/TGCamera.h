@@ -68,6 +68,7 @@
 
 - (void)toogleWithFlashButton:(UIButton *)flashButton;
 
+-(UIImage*)captureImageSilentWithVideoOrientation:(AVCaptureVideoOrientation)videoOrientation;
 @end
 
 
